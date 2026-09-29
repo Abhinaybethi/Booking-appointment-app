@@ -22,18 +22,14 @@ const User = sequelize.define("User", {
         allowNull: false,
         unique: true,
         validate: {
-            isEmail: true,        // Sequelize built-in email validator
+            isEmail: true,
             notEmpty: true
         }
     },
 
     phone: {
         type: DataTypes.STRING(20),
-        allowNull: false,
-        validate: {
-            notEmpty: true,
-            len: [7, 20]           // at least 7 digits, max 20 chars
-        }
+        allowNull: true
     }
 });
 

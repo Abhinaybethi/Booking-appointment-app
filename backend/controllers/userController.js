@@ -1,13 +1,13 @@
-const User = require("../models/User");
+const { User, Booking, Bus } = require("../models/index");
 
 const createUser = async (req, res) => {
     try {
         const { name, email, phone } = req.body;
 
-        // Input validation
-        if (!name || !email || !phone) {
+        // Input validation: name and email are mandatory
+        if (!name || !email) {
             return res.status(400).json({
-                message: "name, email, and phone are required"
+                message: "name and email are required"
             });
         }
 
@@ -19,7 +19,7 @@ const createUser = async (req, res) => {
             });
         }
 
-        const user = await User.create({ name, email, phone });
+        const user = await User.create({ name, email, phone: phone || null });
 
         res.status(201).json({
             message: "User created successfully",
@@ -45,13 +45,45 @@ const createUser = async (req, res) => {
 const getUsers = async (req, res) => {
     try {
         const users = await User.findAll();
-
         res.status(200).json(users);
     } catch (error) {
         console.error(error);
-
         res.status(500).json({
             message: "Failed to fetch users",
+            error: error.message
+        });
+    }
+};
+
+// GET /users/:id/bookings - Fetch all bookings for a user with bus details
+const getUserBookings = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const user = await User.findByPk(id);
+        if (!user) {
+            return res.status(404).json({
+                message: `User with id ${id} not found`
+            });
+        }
+
+        const bookings = await Booking.findAll({
+            where: { userId: id },
+            attributes: ["id", "seatNumber"],
+            include: [
+                {
+                    model: Bus,
+                    as: "bus",
+                    attributes: ["busNumber"]
+                }
+            ]
+        });
+
+        res.status(200).json(bookings);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: "Failed to fetch user bookings",
             error: error.message
         });
     }
@@ -69,7 +101,6 @@ const updateUser = async (req, res) => {
             });
         }
 
-        // Only update fields that were actually sent
         if (name)  user.name  = name;
         if (email) user.email = email;
         if (phone) user.phone = phone;
@@ -124,6 +155,7 @@ const deleteUser = async (req, res) => {
 module.exports = {
     createUser,
     getUsers,
+    getUserBookings,
     updateUser,
     deleteUser
 };
