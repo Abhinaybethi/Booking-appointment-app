@@ -1,17 +1,46 @@
 const User = require("./User");
 const Post = require("./Post");
+const Student = require("./Student");
+const Course = require("./Course");
+const StudentCourse = require("./StudentCourse");
 
-// One-to-Many: one User can have many Posts
-// Sequelize automatically adds userId as a foreign key to the Post table
+// ==========================================
+// 1:M Association: User -> Post
+// ==========================================
 User.hasMany(Post, {
-    foreignKey: "userId",   // column name in Posts table
-    as: "posts",            // alias for eager loading
-    onDelete: "CASCADE"     // deleting a user removes their posts too
+    foreignKey: "userId",
+    as: "posts",
+    onDelete: "CASCADE"
 });
 
 Post.belongsTo(User, {
     foreignKey: "userId",
-    as: "author"            // alias for eager loading
+    as: "author"
 });
 
-module.exports = { User, Post };
+// ==========================================
+// M:N Association: Student <-> Course
+// ==========================================
+// A Student can enroll in many Courses
+Student.belongsToMany(Course, {
+    through: StudentCourse,
+    foreignKey: "studentId",
+    otherKey: "courseId",
+    as: "courses"
+});
+
+// A Course can have many Students
+Course.belongsToMany(Student, {
+    through: StudentCourse,
+    foreignKey: "courseId",
+    otherKey: "studentId",
+    as: "students"
+});
+
+module.exports = {
+    User,
+    Post,
+    Student,
+    Course,
+    StudentCourse
+};

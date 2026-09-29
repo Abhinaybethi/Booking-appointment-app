@@ -7,6 +7,7 @@ require("./models/index"); // loads all models + associations
 
 const userRoutes = require("./routes/userRoutes");
 const postRoutes = require("./routes/postRoutes");
+const studentCourseRoutes = require("./routes/studentCourseRoutes");
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use(express.json());
 
 app.use("/users", userRoutes);
 app.use("/posts", postRoutes);
+app.use("/", studentCourseRoutes);
 
 app.get("/", (req, res) => {
     res.json({
