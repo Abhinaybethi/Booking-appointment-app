@@ -1,12 +1,14 @@
 const { Sequelize } = require("sequelize");
+require("dotenv").config();
 
 const sequelize = new Sequelize(
-    "booking_app",
-    "root",
-    "1234",
+    process.env.DB_NAME,
+    process.env.DB_USER,
+    process.env.DB_PASSWORD,
     {
-        host: "localhost",
-        dialect: "mysql"
+        host: process.env.DB_HOST || "localhost",
+        dialect: process.env.DB_DIALECT || "mysql",
+        logging: false // disable SQL query logs in console (set to console.log to enable)
     }
 );
 

@@ -9,19 +9,31 @@ const User = sequelize.define("User", {
     },
 
     name: {
-        type: DataTypes.STRING,
-        allowNull: false
+        type: DataTypes.STRING(100),
+        allowNull: false,
+        validate: {
+            notEmpty: true,
+            len: [2, 100]
+        }
     },
 
     email: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(255),
         allowNull: false,
-        unique: true
+        unique: true,
+        validate: {
+            isEmail: true,        // Sequelize built-in email validator
+            notEmpty: true
+        }
     },
 
     phone: {
-        type: DataTypes.STRING,
-        allowNull: false
+        type: DataTypes.STRING(20),
+        allowNull: false,
+        validate: {
+            notEmpty: true,
+            len: [7, 20]           // at least 7 digits, max 20 chars
+        }
     }
 });
 

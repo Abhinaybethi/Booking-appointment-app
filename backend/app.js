@@ -1,17 +1,24 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 
 const sequelize = require("./config/database");
-require("./models/User");
+require("./models/index"); // loads all models + associations
 
 const userRoutes = require("./routes/userRoutes");
+const postRoutes = require("./routes/postRoutes");
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: process.env.CORS_ORIGIN || "*", // restrict in production via CORS_ORIGIN env var
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+}));
 app.use(express.json());
 
 app.use("/users", userRoutes);
+app.use("/posts", postRoutes);
 
 app.get("/", (req, res) => {
     res.json({
@@ -19,7 +26,12 @@ app.get("/", (req, res) => {
     });
 });
 
-const PORT = 3000;
+// 404 handler for unknown routes
+app.use((req, res) => {
+    res.status(404).json({ message: "Route not found" });
+});
+
+const PORT = process.env.PORT || 3000;
 
 sequelize
     .sync()
@@ -32,4 +44,5 @@ sequelize
     })
     .catch((error) => {
         console.error("Database synchronization failed:", error);
+        process.exit(1); // exit cleanly on fatal DB error
     });
